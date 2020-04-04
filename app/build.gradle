@@ -1,0 +1,114 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+def keystorePropertiesFile = rootProject.file("private.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    viewBinding {
+        enabled = true
+    }
+
+    defaultConfig {
+        applicationId "ir.gunay.weather"
+        minSdkVersion 17
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        resConfigs "en", "fa"
+        /*testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"*/
+    }
+
+    signingConfigs {
+        config {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('key.keystore')
+            storePassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            zipAlignEnabled true
+            debuggable false
+            signingConfig signingConfigs.config
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "APK_KEY", "${keystoreProperties["APK-KEY"]}")
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "Weather_v${variant.versionName}.apk"
+                }
+            }
+        }
+        debug {
+            buildConfigField("String", "APK_KEY", "${keystoreProperties["APK-KEY"]}")
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    // support library
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.fragment:fragment-ktx:1.2.4'
+    implementation "com.google.android.material:material:1.2.0-alpha05"
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+    // live date + life cycles
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+
+    // coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5'
+
+    // location
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    // retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation "com.squareup.retrofit2:converter-moshi:2.8.1"
+    implementation 'com.squareup.okhttp3:okhttp:4.4.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.4.1'
+
+    // dagger
+    implementation "com.google.dagger:dagger:2.27"
+    kapt "com.google.dagger:dagger-compiler:2.27"
+
+    // coil
+    implementation "io.coil-kt:coil:0.9.5"
+
+    // timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    //test
+    /*testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'*/
+}
